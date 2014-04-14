@@ -59,6 +59,12 @@ describe "BunnyMock Integration Tests", :integration => true do
       queue.default_consumer.message_count.should == msg_count
     end
   end
+
+  describe "#create_channel" do
+    When(:bunny) { bunny = BunnyMock.new }
+    When(:channel) { bunny.create_channel }
+    Then { channel.should be_a BunnyMock::Channel }
+  end
 end
 
 describe BunnyMock do
@@ -88,6 +94,17 @@ describe BunnyMock do
     Then { exchange.should be_a BunnyMock::Exchange }
     Then { exchange.name.should == "my_exch" }
     Then { exchange.type.should == :direct }
+  end
+end
+
+describe BunnyMock::Channel do
+  describe "#queue" do
+    When(:channel) { BunnyMock.new.create_channel }
+    When(:queue) { channel.queue("my_queue") }
+    Then { queue.should be_a BunnyMock::Queue }
+    Then { channel.default_exchange.name.should eq("default") }
+    Then { channel.default_exchange.should be_a BunnyMock::Exchange }
+
   end
 end
 
@@ -181,6 +198,10 @@ describe BunnyMock::Queue do
     Then { queue.should_not be_exclusive }
     Then { queue.arguments.should == {"x-ha-policy" => "all"} }
     Then { expect { queue.wtf }.to raise_error NoMethodError }
+  end
+
+  describe "#purge" do
+    Then { expect { queue.purge }.to_not raise_error NoMethodError }
   end
 end
 

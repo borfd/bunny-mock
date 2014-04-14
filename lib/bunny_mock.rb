@@ -20,6 +20,22 @@ class BunnyMock
     BunnyMock::Exchange.new(*attrs)
   end
 
+  def create_channel
+    BunnyMock::Channel.new
+  end
+
+  class Channel
+    attr_accessor :default_exchange
+
+    def initialize
+      self.default_exchange = BunnyMock::Exchange.new('default')
+    end
+
+    def queue(*attrs)
+      BunnyMock::Queue.new(*attrs)
+    end
+  end
+
   class Consumer
     attr_accessor :message_count
     def initialize(c)
@@ -79,6 +95,8 @@ class BunnyMock
         super
       end
     end
+
+    def purge() end
   end
 
   class Exchange
